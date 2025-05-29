@@ -1,11 +1,11 @@
 <?php
 include('conexao.php');
 
-if (isset($_POST['email']) || isset($_POST['senha'])) {
+if (isset($_POST['email']) && isset($_POST['senha'])) {
 
-    if (strlen($_POST['email']) == 0) {
+    if (empty($_POST['email'])) {
         echo "Preencha seu e-mail";
-    } else if (strlen($_POST['senha']) == 0) {
+    } elseif (empty($_POST['senha'])) {
         echo "Preencha sua senha";
     } else {
 
@@ -17,22 +17,24 @@ if (isset($_POST['email']) || isset($_POST['senha'])) {
 
         $quantidade = $sql_query->num_rows;
 
-        if ($quantidade == 1) {
-
+        if ($quantidade === 1) {
             $usuario = $sql_query->fetch_assoc();
 
-            if(!isset($_SESSION)) {
+            if (session_status() !== PHP_SESSION_ACTIVE) {
                 session_start();
             }
 
             $_SESSION['id'] = $usuario['id'];
             $_SESSION['nome'] = $usuario['nome'];
-            
+
             header("Location: painel.php");
+            exit;
         } else {
             echo "Falha ao logar! E-mail ou senha incorretos";
         }
     }
+} else {
+    echo "Preencha todos os campos do formulário.";
 }
 ?>
 <!DOCTYPE html>
