@@ -1,24 +1,28 @@
+<div id="if">
 <?php
 include('conexao.php');
 
 if (isset($_POST['email']) && isset($_POST['senha'])) {
-
+     //informação que diz que o email não foi digitado
     if (empty($_POST['email'])) {
         echo "Preencha seu e-mail";
+    // informação que fala que a senha não foi digitada
     } elseif (empty($_POST['senha'])) {
         echo "Preencha sua senha";
     } else {
-
-        $email = $mysqli->real_escape_string($_POST['email']);
-        $senha = $mysqli->real_escape_string($_POST['senha']);
-
-        $sql_code = "SELECT * FROM login WHERE email = '$email' AND senha = '$senha'";
-        $sql_query = $mysqli->query($sql_code) or die("Falha na execução do código SQL: " . $mysqli->error);
-
-        $quantidade = $sql_query->num_rows;
-
-        if ($quantidade === 1) {
-            $usuario = $sql_query->fetch_assoc();
+        //Essas linhas pegam o valor do campo email e senha enviado por um formulário HTML usando o método POST.
+        $email = $_POST['email'];
+        $senha = $_POST['senha'];
+         //ele prepara e seleciona tudo da tabela login (where adiciona uma condição) email e senha 
+        $stmt = $pdo->prepare("SELECT * FROM login WHERE email = :email AND senha = :senha");
+        //aqui o valor das variasveis muda
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':senha', $senha);
+        //executa
+        $stmt->execute();
+        
+        if ($stmt->rowCount() === 1) {
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (session_status() !== PHP_SESSION_ACTIVE) {
                 session_start();
@@ -37,18 +41,20 @@ if (isset($_POST['email']) && isset($_POST['senha'])) {
     echo "Preencha todos os campos do formulário.";
 }
 ?>
+</div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>login</title>
+     <link rel="stylesheet" href="stlyle.css">
 </head>
 <body>
     <div id="titulo">
     <h1>Faça login</h1>
     </div>
-<div>
+<div id="formulario">
     <form action="" method= "POST">
     <p>
         <LAbel>E-mail</LAbel>
